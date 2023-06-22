@@ -62,6 +62,37 @@ const Cart = (props) => {
       card.value = companyName;
     });
   };
+
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const contents = e.target.result;
+        parseCSV(contents);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const parseCSV = (csvData) => {
+    const rows = csvData.split("\n");
+    const headers = rows[0].split(",");
+    const parsedData = rows.slice(1).map((row) => {
+      const values = row.split(",");
+      const formData = {};
+      headers.forEach((header, index) => {
+        formData[header] = values[index];
+      });
+      return formData;
+    });
+    setFormDataArray(parsedData);
+    setCount(parsedData.length)
+    console.log(parsedData)
+  };
+
+
   useEffect(() => {
     localStorage.setItem("Count", count);
   }, [count]);
@@ -83,6 +114,7 @@ const Cart = (props) => {
                 <input
                   type="text"
                   placeholder="Enter Your Name"
+                  value={formData["Name"] || ""}
                   onChange={(e) => handleChange(e, "Name", index)}
                 />
               </div>
@@ -93,6 +125,7 @@ const Cart = (props) => {
                 <input
                   type="text"
                   placeholder="Enter Job Title"
+                  value={formData["Job Title"] || ""}
                   onChange={(e) => handleChange(e, "Job Title", index)}
                 />
               </div>
@@ -103,6 +136,7 @@ const Cart = (props) => {
                 <input
                   type="number"
                   placeholder="Enter Mobile Number"
+                  value={formData["Mobile Number"] || ""}
                   onChange={(e) => handleChange(e, "Mobile Number", index)}
                 />
               </div>
@@ -113,6 +147,7 @@ const Cart = (props) => {
                 <input
                   type="text"
                   placeholder="Enter E-mail Address"
+                  value={formData["Email"] || ""}
                   onChange={(e) => handleChange(e, "Email", index)}
                 />
               </div>
@@ -124,6 +159,7 @@ const Cart = (props) => {
                   type="text"
                   placeholder="Enter Company Name"
                   className="company-name-input"
+                  value={formData["Company Name"] || ""}
                   onChange={(e) => handleChange(e, "Company Name", index)}
                 />
               </div>
@@ -134,6 +170,7 @@ const Cart = (props) => {
                 <input
                   type="text"
                   placeholder="Enter Company Website"
+                  value={formData["Company Website"] || ""}
                   onChange={(e) => handleChange(e, "Company Website", index)}
                 />
               </div>
@@ -144,6 +181,7 @@ const Cart = (props) => {
                 <input
                   type="text"
                   placeholder="Enter Company Address"
+                  value={formData["Company Address"] || ""}
                   onChange={(e) => handleChange(e, "Company Address", index)}
                 />
               </div>
@@ -154,6 +192,7 @@ const Cart = (props) => {
                 <input
                   type="number"
                   placeholder="Enter Company Phone Number"
+                  value={formData["Company Phone Number"] || ""}
                   onChange={(e) =>
                     handleChange(e, "Company Phone Number", index)
                   }
@@ -184,6 +223,7 @@ const Cart = (props) => {
       <button type="button" onClick={handleExportCSV}>
         Export to CSV
       </button>
+      <input type="file" accept=".csv" onChange={handleFileUpload} />
     </div>
   );
 };
