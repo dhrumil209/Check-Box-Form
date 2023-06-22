@@ -4,8 +4,9 @@ const Cart = (props) => {
     const storedCount = localStorage.getItem("Count");
     return storedCount ? parseInt(storedCount) : 1;
   });
-  const [companyName, setCompanyName] = useState("");
+  const [applyToAllCards, setApplyToAllCards] = useState(false);
   const [formDataArray, setFormDataArray] = useState([]);
+  
   const handleAddCart = () => {
     setCount((prevCount) => {
       const newCount = prevCount + 1;
@@ -20,11 +21,9 @@ const Cart = (props) => {
       return newCount;
     });
   };
-  // const handleCompanyNameChange = (event) => {
-  //   setCompanyName(event.target.value);
-  // };
+
   const handleChange = (event, field, index) => {
-    setCompanyName(event.target.value);
+  
     setFormDataArray((prevFormDataArray) => {
       const updatedArray = [...prevFormDataArray];
       if (!updatedArray[index]) {
@@ -56,13 +55,19 @@ const Cart = (props) => {
       document.body.removeChild(link);
     }
   };
-  const handleFillAllCards = () => {
-    const cards = document.querySelectorAll(".company-name-input");
-    cards.forEach((card) => {
-      card.value = companyName;
-    });
+  
+  const handleApplyToAllCards = () => {
+    if (applyToAllCards) {
+      const firstFormData = formDataArray[0] || {};
+      setFormDataArray((prevFormDataArray) => {
+        const updatedArray = [...prevFormDataArray];
+        for (let i = 1; i < count; i++) {
+          updatedArray[i] = { ...firstFormData };
+        }
+        return updatedArray;
+      });
+    }
   };
-
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -88,15 +93,14 @@ const Cart = (props) => {
       return formData;
     });
     setFormDataArray(parsedData);
-    setCount(parsedData.length)
-    console.log(parsedData)
+    setCount(parsedData.length);
+    console.log(parsedData);
   };
-
 
   useEffect(() => {
     localStorage.setItem("Count", count);
   }, [count]);
-  
+
   const cartIncrement = () => {
     const cart = [];
     for (let i = 1; i <= count; i++) {
@@ -159,7 +163,8 @@ const Cart = (props) => {
                   type="text"
                   placeholder="Enter Company Name"
                   className="company-name-input"
-                  value={formData["Company Name"] || ""}
+                 
+                  value={applyToAllCards ? formDataArray[0]["Company Name"] || "" : formData["Company Name"] || ""}
                   onChange={(e) => handleChange(e, "Company Name", index)}
                 />
               </div>
@@ -170,7 +175,8 @@ const Cart = (props) => {
                 <input
                   type="text"
                   placeholder="Enter Company Website"
-                  value={formData["Company Website"] || ""}
+                  
+                  value={applyToAllCards ? formDataArray[0]["Company Website"] || "" : formData["Company Website"] || ""}
                   onChange={(e) => handleChange(e, "Company Website", index)}
                 />
               </div>
@@ -181,7 +187,8 @@ const Cart = (props) => {
                 <input
                   type="text"
                   placeholder="Enter Company Address"
-                  value={formData["Company Address"] || ""}
+                  // 
+                  value={applyToAllCards ? formDataArray[0]["Company Address"] || "" : formData["Company Address"] || ""}
                   onChange={(e) => handleChange(e, "Company Address", index)}
                 />
               </div>
@@ -192,7 +199,8 @@ const Cart = (props) => {
                 <input
                   type="number"
                   placeholder="Enter Company Phone Number"
-                  value={formData["Company Phone Number"] || ""}
+                  
+                  value={applyToAllCards ? formDataArray[0]["Company Phone Number"] || "" : formData["Company Phone Number"] || ""}
                   onChange={(e) =>
                     handleChange(e, "Company Phone Number", index)
                   }
@@ -213,12 +221,14 @@ const Cart = (props) => {
         {count}
         <button onClick={handleAddCart}>+</button>
       </div>
-      {props.checkedCompanyName && (
-        <div>
-          <input type="checkbox" onChange={handleFillAllCards} />
-          Apply Company Name To All Cards
-        </div>
-      )}
+      <div>
+        <input
+          type="checkbox"
+          onChange={(e) => setApplyToAllCards(e.target.checked)}
+        />
+        Apply Company Details to All Cards
+      </div>
+      
       {cartIncrement()}
       <button type="button" onClick={handleExportCSV}>
         Export to CSV
